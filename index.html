@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Color Prediction Game</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #00d4ff22;
+    }
+    header h1 { font-size: 1.3rem; color: #00d4ff; letter-spacing: 1px; }
+    .wallet {
+      background: #1e2a3a;
+      border: 1px solid #00d4ff44;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+    .wallet span { color: #00d4ff; font-weight: 700; }
+
+    /* ── Main layout ── */
+    .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+
+    /* ── Round info ── */
+    .round-info {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #ffffff10;
+    }
+    .round-label { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    .round-num { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .timer-wrap { text-align: center; }
+    .timer {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: #00d4ff;
+      line-height: 1;
+    }
+    .timer.urgent { color: #ff4d4d; animation: pulse 0.5s infinite alternate; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+    .timer-label { font-size: 0.7rem; color: #aaa; margin-top: 2px; }
+
+    /* ── Color wheel / result display ── */
+    .result-display {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .spin-ring {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #ff4d4d 0deg 120deg,
+        #4dff91 120deg 240deg,
+        #6c63ff 240deg 360deg
+      );
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 30px #00d4ff44;
+      transition: transform 0.6s cubic-bezier(.4,2,.6,1);
+      position: relative;
+    }
+    .spin-ring.spinning { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-inner {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      background: #0f0f1a;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      z-index: 1;
+    }
+
+    /* ── Last result badge ── */
+    .last-result {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 0.85rem;
+      color: #aaa;
+      min-height: 24px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .badge-red    { background: #ff4d4d22; border: 1px solid #ff4d4d; color: #ff4d4d; }
+    .badge-green  { background: #4dff9122; border: 1px solid #4dff91; color: #4dff91; }
+    .badge-violet { background: #6c63ff22; border: 1px solid #6c63ff; color: #6c63ff; }
+
+    /* ── Bet amount ── */
+    .bet-section {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      border: 1px solid #ffffff10;
+    }
+    .section-title {
+      font-size: 0.75rem;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .amount-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .amount-btn {
+      background: #0f0f1a;
+      border: 1px solid #ffffff20;
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px 0;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .amount-btn:hover { border-color: #00d4ff88; }
+    .amount-btn.active { background: #00d4ff22; border-color: #00d4ff; color: #00d4ff; }
+    .custom-amount {
+      width: 100%;
+      background: #0f0f1a;
+      border: 1px solid #ffffff20;
+      border-radius: 8px;
+      color: #fff;
+      padding: 9px 14px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .custom-amount:focus { border-color: #00d4ff; }
+
+    /* ── Color buttons ── */
+    .color-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .color-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 18px 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .color-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px #0007; }
+    .color-btn:active { transform: scale(0.97); }
+    .color-btn .multiplier { font-size: 0.72rem; font-weight: 500; opacity: 0.85; }
+    .btn-red    { background: linear-gradient(135deg, #ff4d4d, #cc0000); color: #fff; }
+    .btn-green  { background: linear-gradient(135deg, #4dff91, #00b34d); color: #004d1a; }
+    .btn-violet { background: linear-gradient(135deg, #9b8fff, #4a3fcf); color: #fff; }
+    .color-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+    /* ── My bet panel ── */
+    .my-bet-panel {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      border: 1px solid #ffffff10;
+      min-height: 54px;
+    }
+    .my-bet-empty { color: #555; font-size: 0.85rem; }
+    .my-bet-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .my-bet-color { font-weight: 700; }
+    .my-bet-amount { color: #00d4ff; font-weight: 700; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e2a3a;
+      border: 1px solid #00d4ff44;
+      border-radius: 24px;
+      padding: 10px 24px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Win popup ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: #000b;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .overlay.show { opacity: 1; pointer-events: all; }
+    .popup {
+      background: #1a1a2e;
+      border-radius: 20px;
+      padding: 32px 40px;
+      text-align: center;
+      border: 2px solid;
+      min-width: 260px;
+      transform: scale(0.85);
+      transition: transform 0.3s;
+    }
+    .overlay.show .popup { transform: scale(1); }
+    .popup.win  { border-color: #4dff91; }
+    .popup.lose { border-color: #ff4d4d; }
+    .popup h2 { font-size: 2rem; margin-bottom: 8px; }
+    .popup.win  h2 { color: #4dff91; }
+    .popup.lose h2 { color: #ff4d4d; }
+    .popup p { color: #ccc; margin-bottom: 6px; font-size: 0.95rem; }
+    .popup .big { font-size: 1.6rem; font-weight: 800; color: #fff; margin: 10px 0; }
+    .popup-close {
+      margin-top: 16px;
+      background: #00d4ff;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 32px;
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* ── History ── */
+    .history-section {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 30px;
+      border: 1px solid #ffffff10;
+    }
+    .history-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .dot-red    { background: #ff4d4d; }
+    .dot-green  { background: #4dff91; color: #004d1a; }
+    .dot-violet { background: #6c63ff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>&#127777; ColorWin</h1>
+  <div class="wallet">Balance: <span id="balance">1000.00</span></div>
+</header>
+
+<div class="container">
+
+  <!-- Round + Timer -->
+  <div class="round-info">
+    <div>
+      <div class="round-label">Round</div>
+      <div class="round-num" id="round-num">#0001</div>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer" id="timer">30</div>
+      <div class="timer-label">seconds left</div>
+    </div>
+    <div style="text-align:right">
+      <div class="round-label">Phase</div>
+      <div class="round-num" id="phase-label" style="font-size:0.9rem">Betting</div>
+    </div>
+  </div>
+
+  <!-- Spin Wheel -->
+  <div class="result-display">
+    <div class="spin-ring" id="spin-ring">
+      <div class="spin-inner" id="spin-icon">&#127919;</div>
+    </div>
+  </div>
+
+  <!-- Last Result -->
+  <div class="last-result" id="last-result">&#8212; waiting for first result &#8212;</div>
+
+  <!-- Bet Amount -->
+  <div class="bet-section">
+    <div class="section-title">Select Bet Amount</div>
+    <div class="amount-grid">
+      <button class="amount-btn active" data-val="10">&#8377;10</button>
+      <button class="amount-btn" data-val="50">&#8377;50</button>
+      <button class="amount-btn" data-val="100">&#8377;100</button>
+      <button class="amount-btn" data-val="500">&#8377;500</button>
+    </div>
+    <input class="custom-amount" type="number" id="custom-amount" placeholder="Custom amount..." min="1" />
+  </div>
+
+  <!-- Color Buttons -->
+  <div class="color-section">
+    <button class="color-btn btn-red" id="btn-red" onclick="placeBet('red')">
+      &#128308; Red
+      <span class="multiplier">2&#215; payout</span>
+    </button>
+    <button class="color-btn btn-violet" id="btn-violet" onclick="placeBet('violet')">
+      &#128156; Violet
+      <span class="multiplier">4.5&#215; payout</span>
+    </button>
+    <button class="color-btn btn-green" id="btn-green" onclick="placeBet('green')">
+      &#128994; Green
+      <span class="multiplier">2&#215; payout</span>
+    </button>
+  </div>
+
+  <!-- My Current Bet -->
+  <div class="my-bet-panel">
+    <div class="section-title">My Bet This Round</div>
+    <div id="my-bet-display" class="my-bet-empty">No bet placed yet</div>
+  </div>
+
+  <!-- History -->
+  <div class="history-section">
+    <div class="section-title">Recent Results</div>
+    <div class="history-dots" id="history-dots"></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Win/Lose Popup -->
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    <h2 id="popup-title">You Won!</h2>
+    <p id="popup-sub">Result: <strong id="popup-color"></strong></p>
+    <div class="big" id="popup-amount"></div>
+    <p id="popup-balance"></p>
+    <button class="popup-close" onclick="closePopup()">Continue</button>
+  </div>
+</div>
+
+<script>
+  let balance      = 1000;
+  let roundNum     = 1;
+  let timeLeft     = 30;
+  let phase        = 'betting';
+  let currentBet   = null;
+  let history      = [];
+  let selectedAmt  = 10;
+  let timerInterval;
+
+  const ROUND_TIME    = 30;
+  const RESOLVE_TIME  = 5;
+  const PAYOUTS = { red: 2, green: 2, violet: 4.5 };
+
+  const $balance    = document.getElementById('balance');
+  const $roundNum   = document.getElementById('round-num');
+  const $timer      = document.getElementById('timer');
+  const $phaseLabel = document.getElementById('phase-label');
+  const $spinRing   = document.getElementById('spin-ring');
+  const $spinIcon   = document.getElementById('spin-icon');
+  const $lastResult = document.getElementById('last-result');
+  const $myBet      = document.getElementById('my-bet-display');
+  const $histDots   = document.getElementById('history-dots');
+  const $toast      = document.getElementById('toast');
+  const $overlay    = document.getElementById('overlay');
+  const $popup      = document.getElementById('popup');
+
+  document.querySelectorAll('.amount-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedAmt = Number(btn.dataset.val);
+      document.getElementById('custom-amount').value = '';
+    });
+  });
+
+  document.getElementById('custom-amount').addEventListener('input', e => {
+    const v = Number(e.target.value);
+    if (v > 0) {
+      selectedAmt = v;
+      document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+    }
+  });
+
+  function placeBet(color) {
+    if (phase !== 'betting') { showToast('Betting is closed!'); return; }
+    if (currentBet)          { showToast('You already placed a bet this round!'); return; }
+    if (selectedAmt <= 0)    { showToast('Invalid amount'); return; }
+    if (selectedAmt > balance) { showToast('Insufficient balance!'); return; }
+    balance -= selectedAmt;
+    currentBet = { color, amount: selectedAmt };
+    updateBalance();
+    renderMyBet();
+    showToast('Bet placed on ' + color.toUpperCase() + '!');
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      renderTimer();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (phase === 'betting') startResolving();
+        else                     startNewRound();
+      }
+    }, 1000);
+  }
+
+  function startResolving() {
+    phase = 'resolving';
+    timeLeft = RESOLVE_TIME;
+    $phaseLabel.textContent = 'Drawing...';
+    lockBtns(true);
+    $spinRing.classList.add('spinning');
+    startTimer();
+  }
+
+  function startNewRound() {
+    $spinRing.classList.remove('spinning');
+    const result = pickResult();
+    resolveRound(result);
+    setTimeout(() => {
+      currentBet = null;
+      roundNum++;
+      phase = 'betting';
+      timeLeft = ROUND_TIME;
+      lockBtns(false);
+      $phaseLabel.textContent = 'Betting';
+      renderMyBet();
+      $roundNum.textContent = '#' + String(roundNum).padStart(4, '0');
+      startTimer();
+    }, 2000);
+  }
+
+  function pickResult() {
+    const rand = Math.random();
+    if (rand < 0.05) return 'violet';
+    if (rand < 0.525) return 'red';
+    return 'green';
+  }
+
+  function resolveRound(result) {
+    const icons = { red: '&#128308;', green: '&#128994;', violet: '&#128156;' };
+    $spinIcon.innerHTML = icons[result];
+    history.unshift(result);
+    if (history.length > 30) history.pop();
+    renderHistory();
+    renderLastResult(result);
+    if (!currentBet) return;
+    const won = currentBet.color === result;
+    let delta = 0;
+    if (won) {
+      delta = Math.floor(currentBet.amount * PAYOUTS[result]);
+      balance += delta;
+    }
+    updateBalance();
+    showPopup(won, result, delta);
+  }
+
+  function renderTimer() {
+    $timer.textContent = timeLeft;
+    $timer.classList.toggle('urgent', timeLeft <= 5);
+  }
+
+  function renderMyBet() {
+    if (!currentBet) {
+      $myBet.innerHTML = '<span class="my-bet-empty">No bet placed yet</span>';
+      return;
+    }
+    const colorClass = currentBet.color === 'violet' ? 'badge-violet' :
+                       currentBet.color === 'red'    ? 'badge-red' : 'badge-green';
+    $myBet.innerHTML = '<div class="my-bet-row"><span>Color: <span class="my-bet-color badge ' + colorClass + '">' + currentBet.color.toUpperCase() + '</span></span><span class="my-bet-amount">&#8377;' + currentBet.amount + '</span></div>';
+  }
+
+  function renderHistory() {
+    $histDots.innerHTML = history.map(r =>
+      '<div class="dot dot-' + r + '" title="' + r + '">' + r[0].toUpperCase() + '</div>'
+    ).join('');
+  }
+
+  function renderLastResult(result) {
+    const label = result.charAt(0).toUpperCase() + result.slice(1);
+    $lastResult.innerHTML = 'Last result: <span class="badge badge-' + result + '">' + label + '</span>';
+  }
+
+  function updateBalance() {
+    $balance.textContent = balance.toFixed(2);
+  }
+
+  function lockBtns(locked) {
+    ['btn-red','btn-green','btn-violet'].forEach(id => {
+      document.getElementById(id).classList.toggle('disabled', locked);
+    });
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    $toast.textContent = msg;
+    $toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $toast.classList.remove('show'), 2200);
+  }
+
+  function showPopup(won, result, delta) {
+    const label = result.charAt(0).toUpperCase() + result.slice(1);
+    $popup.className = 'popup ' + (won ? 'win' : 'lose');
+    document.getElementById('popup-title').textContent  = won ? 'You Won!' : 'You Lost';
+    document.getElementById('popup-color').textContent  = label;
+    document.getElementById('popup-amount').textContent = won ? '+&#8377;' + delta : '-&#8377;' + currentBet.amount;
+    document.getElementById('popup-balance').textContent = 'Balance: &#8377;' + balance.toFixed(2);
+    $overlay.classList.add('show');
+  }
+
+  function closePopup() {
+    $overlay.classList.remove('show');
+  }
+
+  renderTimer();
+  startTimer();
+</script>
+</body>
+</html>
