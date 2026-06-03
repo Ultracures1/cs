@@ -1,0 +1,28 @@
+[26-Apr-2024 08:54:02 UTC] PHP Notice:  Undefined index: json_data in /home/dubaima1/dubaimall.co/upi.php on line 18
+[26-Apr-2024 08:54:07 UTC] PHP Notice:  Undefined index: json_data in /home/dubaima1/dubaimall.co/upi.php on line 18
+[26-Apr-2024 14:28:31 Asia/Kolkata] Failed to insert recharge record: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'tyid' in 'field list'
+[26-Apr-2024 14:29:32 Asia/Kolkata] Failed to insert recharge record: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'amount' in 'field list'
+[28-Apr-2024 19:07:35 Asia/Kolkata] Failed to insert recharge record: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'transaction_id' cannot be null
+[28-Apr-2024 19:10:25 Asia/Kolkata] Failed to insert recharge record: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'phone' cannot be null
+[28-Apr-2024 13:44:24 UTC] PHP Parse error:  syntax error, unexpected '=' in /home/dubaima1/public_html/request_recharge.php on line 4
+[28-Apr-2024 19:15:25 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function generateOrderId() in /home/dubaima1/public_html/request_recharge.php:30
+Stack trace:
+#0 /home/dubaima1/public_html/request_recharge.php(65): insertRecharge(Object(PDO), 2, '100', '442278435207', '7499618774')
+#1 {main}
+  thrown in /home/dubaima1/public_html/request_recharge.php on line 30
+[28-Apr-2024 19:16:25 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Call to undefined function generateOrderId() in /home/dubaima1/public_html/request_recharge.php:32
+Stack trace:
+#0 /home/dubaima1/public_html/request_recharge.php(67): insertRecharge(Object(PDO), 2, '100', '442278435207', '7499618774')
+#1 {main}
+  thrown in /home/dubaima1/public_html/request_recharge.php on line 32
+[09-May-2024 16:26:14 UTC] PHP Warning:  mysqli_connect(): (HY000/1045): Access denied for user '91club'@'localhost' (using password: YES) in /home/dubaima1/public_html/cheak.php on line 8
+[14-Jul-2024 16:47:32 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[27-Aug-2024 12:25:05 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[07-Sep-2024 18:07:50 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[25-Sep-2024 10:25:50 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[26-Sep-2024 15:24:20 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[10-Oct-2024 07:21:46 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[11-Oct-2024 20:33:10 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/public_html/testing.php on line 8
+[05-Nov-2024 02:56:22 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/abcoders.in/testing.php on line 8
+[07-Nov-2024 14:46:47 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/abcoders.in/testing.php on line 8
+[16-Nov-2024 10:58:41 UTC] PHP Notice:  Undefined index: transactionsText in /home/dubaima1/abcoders.in/testing.php on line 8
