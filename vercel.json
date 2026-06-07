@@ -1,1 +1,23 @@
-ewogICJ2ZXJzaW9uIjogMiwKICAiYnVpbGRzIjogWwogICAgewogICAgICAic3JjIjogIi4vc3JjL3NlcnZlci5qcyIsCiAgICAgICJ1c2UiOiAiQHZlcmNlbC9ub2RlIgogICAgfQogIF0sCiAgInJvdXRlcyI6IFsKICAgIHsKICAgICAgInNyYyI6ICIvKC4qKSIsCiAgICAgICJkZXN0IjogIi8iCiAgICB9CiAgXQp9Cg==
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "./src/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ]
+}
