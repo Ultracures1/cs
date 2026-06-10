@@ -1,0 +1,2 @@
+
+export default function Story({params}){ return (<article className="max-w-3xl mx-auto px-4 py-10 prose"><h1 className="text-4xl font-light capitalize">{params.slug.replace('-',' ')}</h1><p>At Suta, every saree is named after a feeling, a place, a memory. This is how we keep craft human.</p><p>Our weavers in Phulia, West Bengal, work on handlooms passed down generations. Supporting 14,000+ artisans is not a tagline — it is our supply chain.</p></article>) }
