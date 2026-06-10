@@ -1,0 +1,25 @@
+# Render Blueprint — deploys backend + frontend with correct root directories.
+# In Render: New → Blueprint → select this repo. Do not create services manually
+# from the repo root; this is a monorepo.
+services:
+  - type: web
+    name: suta-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+
+  - type: web
+    name: suta-frontend
+    runtime: node
+    rootDir: frontend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      # Set this to the backend's public URL (e.g. https://suta-backend.onrender.com)
+      # Render will prompt for the value when you create the blueprint.
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
