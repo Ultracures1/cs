@@ -1,15 +1,42 @@
 
-import Link from 'next/link'
 import {PRODUCTS, FILTERS} from '../../products-data'
+import ProductCard from '../../../components/ProductCard'
+
 export default function Collection({params}){
   const handle = params.handle
   const list = handle==='blouses' ? PRODUCTS.filter(p=>p.category==='blouse') : PRODUCTS.filter(p=>p.category!=='blouse')
-  return (<div className="max-w-7xl mx-auto px-4 py-8 grid md:grid-cols-[240px_1fr] gap-8">
-    <aside className="hidden md:block">
-      <h3 className="font-semibold mb3">Filters</h3>
-      {Object.entries(FILTERS).map(([k,vals])=>(<div key={k} className="mb-4"><p className="text-sm font-medium capitalize mb1">{k}</p><div className="space-y1">{vals.map(v=><label key={v} className="flex items-center gap2 text-sm"><input type="checkbox"/><span>{v}</span></label>)}</div></div>))}
+  return (<main id="main" className="max-w-7xl mx-auto px-4 py-10 grid md:grid-cols-[250px_1fr] gap-10">
+    <aside className="hidden md:block" aria-label="Filters">
+      <h2 className="font-sans text-sm font-semibold uppercase tracking-wide text-ink mb-5">Filters</h2>
+      {Object.entries(FILTERS).map(([group, values]) => (
+        <fieldset key={group} className="mb-6 border-b border-line pb-5">
+          <legend className="font-sans text-sm font-medium capitalize text-ink mb-2.5">{group}</legend>
+          <div className="space-y-1">
+            {values.map(v => (
+              <label key={v} className="flex items-center gap-2.5 py-1.5 text-sm text-ink-soft cursor-pointer hover:text-ink transition-colors duration-150">
+                <input type="checkbox" className="w-4 h-4 rounded border-line accent-[#7A1F2B]"/>
+                <span>{v}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))}
     </aside>
-    <section><div className="flex justify-between items-center mb-4"><h1 className="text-2xl capitalize">{handle}</h1><p className="text-sm text-stone-500">{list.length} products</p></div>
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">{list.map(p=>(<Link key={p.id} href={`/product/${p.id}`} className="bg-white border rounded-2xl overflow-hidden"><img src={p.img} className="aspect-[4/5] object-cover"/><div className="p-3"><h3 className="text-sm">{p.name}</h3><p className="text-xs text-stone-500">{p.fabric} • {p.technique}</p><div className="mt1 flex gap2 items-baseline"><span className="font-semibold">₹{p.price}</span>{p.mrp>p.price && <span className="line-through text-xs text-stone-400">₹{p.mrp}</span>}</div></div></Link>))}</div></section>
-  </div>)
+    <section>
+      <div className="flex items-baseline justify-between mb-6">
+        <h1 className="text-4xl font-medium capitalize">{handle}</h1>
+        <p className="text-sm text-ink-soft font-sans">{list.length} products</p>
+      </div>
+      {list.length === 0 ? (
+        <div className="rounded-2xl border border-line bg-surface-raised p-12 text-center">
+          <p className="font-display text-2xl">Nothing here yet</p>
+          <p className="mt-2 text-sm text-ink-soft font-sans">New pieces are on the loom — check back soon or explore our sarees.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+          {list.map((p, i) => <ProductCard key={p.id} product={p} eager={i < 3}/>)}
+        </div>
+      )}
+    </section>
+  </main>)
 }
